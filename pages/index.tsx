@@ -40,8 +40,9 @@ export default function ImageEditor() {
   const [rotationAngle, setRotationAngle] = useState(0);
 
   const [blurryArea, setBlurryArea] = useState<BlurryArea>(INITIAL_AREA);
+  const [blurryAreas, setBlurryAreas] = useState<BlurryArea[]>([]);
 
-  useEffect(drawImageLayer, [rotationAngle]);
+  useEffect(drawImageLayer, [rotationAngle, blurryAreas]);
   useEffect(drawBlurLayer, [rotationAngle]);
   useEffect(drawDragLayer, [rotationAngle]);
   useEffect(drawDragArea, [blurryArea]);
@@ -58,6 +59,15 @@ export default function ImageEditor() {
       resizeCanvas(canvas, canvasSize);
       context?.rotate((Math.PI / STRAIGHT_ANGLE) * rotationAngle);
       context?.drawImage(image, x, y, width, height);
+
+      blurryAreas
+        .filter(({ blurryImage }) => blurryImage !== undefined)
+        .forEach(({ blurryImage, ...area }) => {
+          const left = area.width > 0 ? area.x : area.x + area.width;
+          const top = area.height > 0 ? area.y : area.y + area.height;
+          context?.putImageData(blurryImage as ImageData, left, top);
+        });
+
       context?.restore();
     }
   }
@@ -124,7 +134,15 @@ export default function ImageEditor() {
   function handleMouseUp() {
     const canvas = blurLayer.current;
     const context = canvas?.getContext("2d");
-
+    if (blurryArea.width !== 0 && blurryArea.height !== 0) {
+      setBlurryAreas((areas) => [
+        ...areas,
+        {
+          ...blurryArea,
+          blurryImage: context?.getImageData(blurryArea.x, blurryArea.y, blurryArea.width, blurryArea.height),
+        },
+      ]);
+    }
     setBlurryArea(INITIAL_AREA);
   }
 
