@@ -7,6 +7,8 @@ const RIGHT_ANGLE = 90;
 const STRAIGHT_ANGLE = 180;
 const COMPLETE_ANGLE = 360;
 
+const BLUR_FILTER = "blur(10px)";
+
 interface Size {
   width: number;
   height: number;
@@ -19,22 +21,41 @@ interface Rectangle extends Size {
 
 export default function ImageEditor() {
   const imageLayer = useRef<HTMLCanvasElement>(null);
+  const blurLayer = useRef<HTMLCanvasElement>(null);
   const [imageSource, setImageSource] = useState("/rana-sawalha-X7UR0BDz-UY-unsplash.jpeg");
   const [rotationAngle, setRotationAngle] = useState(0);
 
   useEffect(drawImageLayer);
+  useEffect(drawBlurLayer);
 
   function drawImageLayer() {
     const canvas = imageLayer.current;
     const context = canvas?.getContext("2d");
     const image = createImageElement(imageSource);
-    image.onload = drawImage;
+    image.onload = drawEditedImage;
 
-    function drawImage() {
+    function drawEditedImage() {
       const { x, y, width, height } = locateImage(image, rotationAngle);
       const canvasSize = getRotatedCanvasSize({ width, height }, rotationAngle);
       resizeCanvas(canvas, canvasSize);
       context?.rotate((Math.PI / STRAIGHT_ANGLE) * rotationAngle);
+      context?.drawImage(image, x, y, width, height);
+      context?.restore();
+    }
+  }
+
+  function drawBlurLayer() {
+    const canvas = blurLayer.current;
+    const context = canvas?.getContext("2d");
+    const image = createImageElement(imageSource);
+    image.onload = drawBlurImage;
+
+    function drawBlurImage() {
+      const { x, y, width, height } = locateImage(image, rotationAngle);
+      const canvasSize = getRotatedCanvasSize({ width, height }, rotationAngle);
+      resizeCanvas(canvas, canvasSize);
+      context?.rotate((Math.PI / STRAIGHT_ANGLE) * rotationAngle);
+      if (context) context.filter = BLUR_FILTER;
       context?.drawImage(image, x, y, width, height);
       context?.restore();
     }
@@ -46,8 +67,13 @@ export default function ImageEditor() {
 
   return (
     <>
-      <canvas ref={imageLayer} />
-      <button onClick={handleRotationClick}>회전</button>
+      <div className="image-editor">
+        <canvas ref={imageLayer} />
+        <canvas ref={blurLayer} />
+      </div>
+      <div>
+        <button onClick={handleRotationClick}>회전</button>
+      </div>
     </>
   );
 }
