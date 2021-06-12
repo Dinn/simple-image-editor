@@ -95,7 +95,7 @@ export default function ImageEditor() {
     const canvas = dragLayer.current;
     const context = canvas?.getContext("2d");
     if (canvas) context?.clearRect(0, 0, canvas.width, canvas.height);
-    if (context) context.fillStyle = "rgba(0, 0, 0, 0.2)";
+    if (context) context.fillStyle = "rgba(255, 255, 255, 0.2)";
     context?.fillRect(blurryArea.x, blurryArea.y, blurryArea.width, blurryArea.height);
   }
 
@@ -140,15 +140,16 @@ export default function ImageEditor() {
   return (
     <>
       <div className="image-editor">
+        <canvas className="blur-layer" ref={blurLayer} />
+        <canvas className="image-layer" ref={imageLayer} />
         <canvas
+          className="drag-layer"
           ref={dragLayer}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
         />
-        <canvas ref={imageLayer} />
-        <canvas ref={blurLayer} />
       </div>
       <div>
         <button onClick={handleRotationClick}>회전</button>
