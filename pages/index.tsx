@@ -207,18 +207,20 @@ export default function ImageEditor() {
           onMouseLeave={handleMouseLeave}
         />
       </div>
-      <div>
-        <button onClick={handleClearClick}>초기화</button>
-        <button onClick={handleRotationLeftClick} disabled={!isRotationMode}>
+      <div className="editor-controller">
+        <button className="control-button" onClick={handleClearClick}>
+          초기화
+        </button>
+        <button className="control-button" onClick={handleRotationLeftClick} disabled={!isRotationMode}>
           왼쪽
         </button>
-        <button onClick={handleRotationClick} disabled={isBlurMode}>
+        <button className="control-button" onClick={handleRotationClick} disabled={isBlurMode}>
           회전 {isRotationMode ? "종료" : "시작"}
         </button>
-        <button onClick={handleRotationRightClick} disabled={!isRotationMode}>
+        <button className="control-button" onClick={handleRotationRightClick} disabled={!isRotationMode}>
           오른쪽
         </button>
-        <button onClick={handleBlurClick} disabled={isRotationMode}>
+        <button className="control-button" onClick={handleBlurClick} disabled={isRotationMode}>
           블러 {isBlurMode ? "종료" : "시작"}
         </button>
       </div>

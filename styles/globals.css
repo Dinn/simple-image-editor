@@ -4,6 +4,7 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
     Helvetica Neue, sans-serif;
+  background-color: blanchedalmond;
 }
 
 a {
@@ -16,10 +17,12 @@ a {
 }
 
 .image-editor {
-  width: 800px;
-  height: 600px;
+  width: 850px;
+  height: 650px;
+  padding: 50px;
   position: relative;
-  margin: auto;
+  margin: 2rem auto 0 auto;
+  background-color: #fafafa;
 }
 
 .blur-layer,
@@ -29,4 +32,19 @@ a {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.editor-controller {
+  width: 850px;
+  margin: auto;
+  padding: 1.5rem;
+  text-align: center;
+  background-color: whitesmoke;
+}
+
+.control-button {
+  margin: 0.25rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: snow;
 }
