@@ -11,6 +11,10 @@ const BLUR_FILTER = "blur(10px)";
 
 const LEFT_CLICK = 1;
 
+const HIGHEST_ENCODING_QUALITY = 1;
+
+const SOURCE = "/rana-sawalha-X7UR0BDz-UY-unsplash.jpeg";
+
 const INITIAL_AREA: BlurryArea = {
   x: 0,
   y: 0,
@@ -36,7 +40,11 @@ export default function ImageEditor() {
   const imageLayer = useRef<HTMLCanvasElement>(null);
   const blurLayer = useRef<HTMLCanvasElement>(null);
   const dragLayer = useRef<HTMLCanvasElement>(null);
-  const [imageSource, setImageSource] = useState("/rana-sawalha-X7UR0BDz-UY-unsplash.jpeg");
+
+  const [isRotationMode, setIsRotationMode] = useState(false);
+  const [isBlurMode, setIsBlurMode] = useState(false);
+
+  const [imageSource, setImageSource] = useState(SOURCE);
   const [rotationAngle, setRotationAngle] = useState(0);
 
   const [blurryArea, setBlurryArea] = useState<BlurryArea>(INITIAL_AREA);
@@ -110,6 +118,7 @@ export default function ImageEditor() {
   }
 
   function handleMouseDown({ buttons, clientX, clientY }: ReactMouseEvent<HTMLCanvasElement>) {
+    if (!isBlurMode) return;
     if (buttons !== LEFT_CLICK) return;
 
     const canvasPosition = dragLayer.current?.getBoundingClientRect() ?? new DOMRect(0, 0, 0, 0);
@@ -121,6 +130,7 @@ export default function ImageEditor() {
   }
 
   function handleMouseMove({ buttons, clientX, clientY }: ReactMouseEvent<HTMLCanvasElement>) {
+    if (!isBlurMode) return;
     if (buttons !== LEFT_CLICK) return;
 
     const canvasPosition = dragLayer.current?.getBoundingClientRect() ?? new DOMRect(0, 0, 0, 0);
@@ -132,6 +142,8 @@ export default function ImageEditor() {
   }
 
   function handleMouseUp() {
+    if (!isBlurMode) return;
+
     const canvas = blurLayer.current;
     const context = canvas?.getContext("2d");
     if (blurryArea.width !== 0 && blurryArea.height !== 0) {
@@ -151,8 +163,34 @@ export default function ImageEditor() {
     handleMouseUp();
   }
 
+  function handleClearClick() {
+    setBlurryAreas([]);
+    setRotationAngle(0);
+    setIsBlurMode(false);
+    setIsRotationMode(false);
+    setImageSource(SOURCE);
+  }
+
   function handleRotationClick() {
+    if (isRotationMode) {
+      setImageSource(imageLayer.current?.toDataURL("image/jpeg", HIGHEST_ENCODING_QUALITY) ?? SOURCE);
+      setRotationAngle(0);
+    }
+    setIsRotationMode((rotationMode) => !rotationMode);
+  }
+  function handleRotationRightClick() {
     setRotationAngle((angle) => (angle + RIGHT_ANGLE) % COMPLETE_ANGLE);
+  }
+  function handleRotationLeftClick() {
+    setRotationAngle((angle) => (angle + COMPLETE_ANGLE - RIGHT_ANGLE) % COMPLETE_ANGLE);
+  }
+
+  function handleBlurClick() {
+    if (isBlurMode) {
+      setImageSource(imageLayer.current?.toDataURL("image/jpeg", HIGHEST_ENCODING_QUALITY) ?? SOURCE);
+      setBlurryAreas([]);
+    }
+    setIsBlurMode((blurMode) => !blurMode);
   }
 
   return (
@@ -170,7 +208,19 @@ export default function ImageEditor() {
         />
       </div>
       <div>
-        <button onClick={handleRotationClick}>회전</button>
+        <button onClick={handleClearClick}>초기화</button>
+        <button onClick={handleRotationLeftClick} disabled={!isRotationMode}>
+          왼쪽
+        </button>
+        <button onClick={handleRotationClick} disabled={isBlurMode}>
+          회전 {isRotationMode ? "종료" : "시작"}
+        </button>
+        <button onClick={handleRotationRightClick} disabled={!isRotationMode}>
+          오른쪽
+        </button>
+        <button onClick={handleBlurClick} disabled={isRotationMode}>
+          블러 {isBlurMode ? "종료" : "시작"}
+        </button>
       </div>
     </>
   );
