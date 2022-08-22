@@ -223,7 +223,10 @@ export default function ImageEditor() {
             />
           </>
         ) : (
-          <input type="file" accept="image/*" onChange={handleImageInput} />
+          <label className="image-uploader">
+            클릭하여 이미지 추가
+            <input className="image-input" type="file" accept="image/*" onChange={handleImageInput} />
+          </label>
         )}
       </div>
       <div className="editor-controller">
