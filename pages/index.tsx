@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, MouseEvent as ReactMouseEvent, ChangeEvent } from "react";
+import EditorController from "../components/EditorController";
 
 const MAX_CANVAS_WIDTH = 800;
 const MAX_CANVAS_HEIGHT = 600;
@@ -176,7 +177,7 @@ export default function ImageEditor() {
     setImageSource(URL.createObjectURL(uploadingFile));
   }
 
-  function handleClearClick() {
+  function handleClear() {
     setBlurryAreas([]);
     setRotationAngle(0);
     setIsBlurMode(false);
@@ -184,21 +185,21 @@ export default function ImageEditor() {
     setImageSource("");
   }
 
-  function handleRotationClick() {
+  function handleRotate() {
     if (isRotationMode) {
       setImageSource(imageLayer.current?.toDataURL("image/jpeg", HIGHEST_ENCODING_QUALITY) ?? "");
       setRotationAngle(0);
     }
     setIsRotationMode((rotationMode) => !rotationMode);
   }
-  function handleRotationRightClick() {
+  function handleRotateRight() {
     setRotationAngle((angle) => (angle + RIGHT_ANGLE) % COMPLETE_ANGLE);
   }
-  function handleRotationLeftClick() {
+  function handleRotateLeft() {
     setRotationAngle((angle) => (angle + COMPLETE_ANGLE - RIGHT_ANGLE) % COMPLETE_ANGLE);
   }
 
-  function handleBlurClick() {
+  function handleBlur() {
     if (isBlurMode) {
       setImageSource(imageLayer.current?.toDataURL("image/jpeg", HIGHEST_ENCODING_QUALITY) ?? "");
       setBlurryAreas([]);
@@ -229,23 +230,19 @@ export default function ImageEditor() {
           </label>
         )}
       </div>
-      <div className="editor-controller">
-        <button className="control-button" onClick={handleClearClick}>
-          초기화
-        </button>
-        <button className="control-button" onClick={handleRotationLeftClick} disabled={!isRotationMode}>
-          왼쪽
-        </button>
-        <button className="control-button" onClick={handleRotationClick} disabled={isBlurMode}>
-          회전 {isRotationMode ? "종료" : "시작"}
-        </button>
-        <button className="control-button" onClick={handleRotationRightClick} disabled={!isRotationMode}>
-          오른쪽
-        </button>
-        <button className="control-button" onClick={handleBlurClick} disabled={isRotationMode}>
-          블러 {isBlurMode ? "종료" : "시작"}
-        </button>
-      </div>
+      <EditorController
+        {...{
+          isBlurMode,
+          isRotationMode,
+          disabled: !imageSource,
+          onClear: handleClear,
+          onSave: () => {},
+          onRotate: handleRotate,
+          onRotateLeft: handleRotateLeft,
+          onRotateRight: handleRotateRight,
+          onBlur: handleBlur,
+        }}
+      />
     </>
   );
 }
