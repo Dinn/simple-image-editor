@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, MouseEvent as ReactMouseEvent } from "react";
+import { useState, useEffect, useRef, MouseEvent as ReactMouseEvent, ChangeEvent } from "react";
 
 const MAX_CANVAS_WIDTH = 800;
 const MAX_CANVAS_HEIGHT = 600;
@@ -12,8 +12,6 @@ const BLUR_FILTER = "blur(10px)";
 const LEFT_CLICK = 1;
 
 const HIGHEST_ENCODING_QUALITY = 1;
-
-const SOURCE = "/rana-sawalha-X7UR0BDz-UY-unsplash.jpeg";
 
 const INITIAL_AREA: BlurryArea = {
   x: 0,
@@ -44,20 +42,22 @@ export default function ImageEditor() {
   const [isRotationMode, setIsRotationMode] = useState(false);
   const [isBlurMode, setIsBlurMode] = useState(false);
 
-  const [imageSource, setImageSource] = useState(SOURCE);
+  const [imageSource, setImageSource] = useState("");
   const [rotationAngle, setRotationAngle] = useState(0);
 
   const [blurryArea, setBlurryArea] = useState<BlurryArea>(INITIAL_AREA);
   const [blurryAreas, setBlurryAreas] = useState<BlurryArea[]>([]);
 
-  useEffect(drawImageLayer, [rotationAngle, blurryAreas]);
-  useEffect(drawBlurLayer, [rotationAngle]);
-  useEffect(drawDragLayer, [rotationAngle]);
+  useEffect(drawImageLayer, [imageSource, rotationAngle, blurryAreas]);
+  useEffect(drawBlurLayer, [imageSource, rotationAngle]);
+  useEffect(drawDragLayer, [imageSource, rotationAngle]);
   useEffect(drawDragArea, [blurryArea]);
 
   function drawImageLayer() {
     const canvas = imageLayer.current;
-    const context = canvas?.getContext("2d");
+    if (canvas === null || imageSource === "") return;
+
+    const context = canvas.getContext("2d");
     const image = createImageElement(imageSource);
     image.onload = drawEditedImage;
 
@@ -82,7 +82,9 @@ export default function ImageEditor() {
 
   function drawBlurLayer() {
     const canvas = blurLayer.current;
-    const context = canvas?.getContext("2d");
+    if (canvas === null || imageSource === "") return;
+
+    const context = canvas.getContext("2d");
     const image = createImageElement(imageSource);
     image.onload = drawBlurImage;
 
@@ -99,6 +101,8 @@ export default function ImageEditor() {
 
   function drawDragLayer() {
     const canvas = dragLayer.current;
+    if (canvas === null || imageSource === "") return;
+
     const image = createImageElement(imageSource);
     image.onload = fitCanvasToImage;
 
@@ -163,17 +167,26 @@ export default function ImageEditor() {
     handleMouseUp();
   }
 
+  function handleImageInput(e: ChangeEvent<HTMLInputElement>) {
+    const uploadingFile = e.target.files?.[0];
+    if (uploadingFile === undefined) {
+      alert("파일 업로드에 실패했습니다.");
+      return;
+    }
+    setImageSource(URL.createObjectURL(uploadingFile));
+  }
+
   function handleClearClick() {
     setBlurryAreas([]);
     setRotationAngle(0);
     setIsBlurMode(false);
     setIsRotationMode(false);
-    setImageSource(SOURCE);
+    setImageSource("");
   }
 
   function handleRotationClick() {
     if (isRotationMode) {
-      setImageSource(imageLayer.current?.toDataURL("image/jpeg", HIGHEST_ENCODING_QUALITY) ?? SOURCE);
+      setImageSource(imageLayer.current?.toDataURL("image/jpeg", HIGHEST_ENCODING_QUALITY) ?? "");
       setRotationAngle(0);
     }
     setIsRotationMode((rotationMode) => !rotationMode);
@@ -187,7 +200,7 @@ export default function ImageEditor() {
 
   function handleBlurClick() {
     if (isBlurMode) {
-      setImageSource(imageLayer.current?.toDataURL("image/jpeg", HIGHEST_ENCODING_QUALITY) ?? SOURCE);
+      setImageSource(imageLayer.current?.toDataURL("image/jpeg", HIGHEST_ENCODING_QUALITY) ?? "");
       setBlurryAreas([]);
     }
     setIsBlurMode((blurMode) => !blurMode);
@@ -196,16 +209,22 @@ export default function ImageEditor() {
   return (
     <>
       <div className="image-editor">
-        <canvas className="blur-layer" ref={blurLayer} />
-        <canvas className="image-layer" ref={imageLayer} />
-        <canvas
-          className="drag-layer"
-          ref={dragLayer}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
-        />
+        {imageSource ? (
+          <>
+            <canvas className="blur-layer" ref={blurLayer} />
+            <canvas className="image-layer" ref={imageLayer} />
+            <canvas
+              className="drag-layer"
+              ref={dragLayer}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseLeave}
+            />
+          </>
+        ) : (
+          <input type="file" accept="image/*" onChange={handleImageInput} />
+        )}
       </div>
       <div className="editor-controller">
         <button className="control-button" onClick={handleClearClick}>
