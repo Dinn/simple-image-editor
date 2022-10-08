@@ -185,6 +185,13 @@ export default function ImageEditor() {
     setImageSource("");
   }
 
+  function handleSave() {
+    const link = document.createElement("a");
+    link.download = "";
+    link.href = imageSource;
+    link.click();
+  }
+
   function handleRotate() {
     if (isRotationMode) {
       setImageSource(imageLayer.current?.toDataURL("image/jpeg", HIGHEST_ENCODING_QUALITY) ?? "");
@@ -236,7 +243,7 @@ export default function ImageEditor() {
           isRotationMode,
           disabled: !imageSource,
           onClear: handleClear,
-          onSave: () => {},
+          onSave: handleSave,
           onRotate: handleRotate,
           onRotateLeft: handleRotateLeft,
           onRotateRight: handleRotateRight,

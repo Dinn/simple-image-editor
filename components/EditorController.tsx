@@ -40,7 +40,7 @@ export default function EditorController({
       <button className="control-button" onClick={onBlur} disabled={disabled || isRotationMode}>
         블러 {isBlurMode ? "종료" : "시작"}
       </button>
-      <button className="control-button" onClick={onSave} disabled={disabled}>
+      <button className="control-button" onClick={onSave} disabled={disabled || isBlurMode || isRotationMode}>
         저장
       </button>
     </div>
