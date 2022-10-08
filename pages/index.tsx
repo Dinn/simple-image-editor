@@ -267,9 +267,10 @@ function getRotatedCanvasSize({ width, height }: Size, rotationAngle: number): S
 
 function locateImage(image: HTMLImageElement, rotationAngle: number): Rectangle {
   const canvasSize = getRotatedCanvasSize({ width: MAX_CANVAS_WIDTH, height: MAX_CANVAS_HEIGHT }, rotationAngle);
+  const isLongerWidth = image.width > image.height + (canvasSize.width - canvasSize.height);
 
-  const width = image.width > image.height ? canvasSize.width : (image.width * canvasSize.height) / image.height;
-  const height = image.width > image.height ? (image.height * canvasSize.width) / image.width : canvasSize.height;
+  const width = isLongerWidth ? canvasSize.width : (image.width * canvasSize.height) / image.height;
+  const height = isLongerWidth ? (image.height * canvasSize.width) / image.width : canvasSize.height;
   const x = -Math.floor(rotationAngle / STRAIGHT_ANGLE) * width;
   const y = -Math.floor(((rotationAngle + RIGHT_ANGLE) % COMPLETE_ANGLE) / STRAIGHT_ANGLE) * height;
 
