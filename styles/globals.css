@@ -27,11 +27,26 @@ a {
 
 .blur-layer,
 .image-layer,
-.drag-layer {
+.drag-layer,
+.image-uploader {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.image-uploader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30%;
+  height: 20%;
+  border: 0.25rem dashed grey;
+  color: grey;
+}
+
+.image-input {
+  display: none;
 }
 
 .editor-controller {
@@ -45,6 +60,4 @@ a {
 .control-button {
   margin: 0.25rem;
   padding: 0.5rem 1rem;
-  border: none;
-  background-color: snow;
 }
